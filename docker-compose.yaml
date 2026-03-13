@@ -7,6 +7,8 @@ services:
       POSTGRES_DB: ortakkasa
       POSTGRES_USER: ortakkasa
       POSTGRES_PASSWORD: ortakkasa
+      LANG: en_US.utf8
+      LC_ALL: en_US.utf8
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -54,12 +56,15 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
     container_name: ortakkasa-web
     restart: unless-stopped
     depends_on:
       - api
     environment:
-      NEXT_PUBLIC_API_URL: http://api:3001
+      # Tarayıcıdan API çağrıları için - Coolify'da domain atadıktan sonra ayarlayın (örn: https://ortakkasa.com/api)
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
     ports:
       - "3000:3000"
 
