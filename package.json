@@ -1,0 +1,27 @@
+{
+  "name": "ortak-kasa",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev --workspace=api",
+    "dev:web": "npm run dev --workspace=web",
+    "build": "npm run build --workspaces",
+    "build:api": "npm run build --workspace=api",
+    "build:web": "npm run build --workspace=web",
+    "db:generate": "npm run prisma:generate --workspace=api",
+    "db:migrate": "cd apps/api && npx prisma migrate dev",
+    "db:studio": "npm run prisma:studio --workspace=api",
+    "db:seed": "cd apps/api && npm run prisma:seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  ORTAK
+  KULLANICI
+}
+
+enum TransactionType {
+  GELIR
+  GIDER
+}
+
+enum AccountType {
+  NAKIT
+  BANKA_HESABI
+  KREDI_KARTI
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  userCompanies UserCompany[]
+  branches      Branch[]
+  accounts      Account[]
+
+  @@index([slug])
+}
+
+model Account {
+  id        String      @id @default(cuid())
+  companyId String
+  name      String
+  type      AccountType
+  createdAt DateTime    @default(now())
+
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+
+  @@index([companyId])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+
+  userCompanies  UserCompany[]
+  branchPartners BranchPartner[]
+
+  @@index([email])
+}
+
+model UserCompany {
+  id        String   @id @default(cuid())
+  userId    String
+  companyId String
+  role      Role
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@index([companyId])
+  @@index([userId])
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String
+  createdAt DateTime @default(now())
+
+  company  Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  partners BranchPartner[]
+  transactions Transaction[]
+
+  @@index([companyId])
+}
+
+model BranchPartner {
+  id         String  @id @default(cuid())
+  branchId   String
+  userId     String
+  percentage Float
+
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([branchId, userId])
+  @@index([branchId])
+  @@index([userId])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  branchId    String
+  amount      Float
+  description String?
+  date        DateTime
+  type        TransactionType
+  accountId   String?
+
+  branch  Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  account Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  @@index([branchId])
+  @@index([branchId, date])
+  @@index([branchId, type])
+  @@index([accountId])
+}

@@ -1,0 +1,42 @@
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
+
+class LoginDto {
+  email: string;
+  password: string;
+}
+
+class RegisterDto {
+  email: string;
+  password: string;
+  name: string;
+  companyName?: string;
+}
+
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @Post('login')
+  async login(@Body() dto: LoginDto) {
+    return this.authService.login(dto.email, dto.password);
+  }
+
+  @Post('register')
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.register(
+      dto.email,
+      dto.password,
+      dto.name,
+      dto.companyName,
+    );
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async me(@CurrentUser() user: { userId: string }) {
+    return this.authService.getProfile(user.userId);
+  }
+}
