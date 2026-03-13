@@ -11,6 +11,10 @@ RUN npm install
 COPY packages/shared ./packages/shared
 COPY apps/api ./apps/api
 
+# Prisma client oluştur (build için DB bağlantısı gerekmez)
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder?schema=public"
+RUN npm run prisma:generate --workspace=api
+
 RUN npm run build --workspace=@ortak-kasa/shared 2>/dev/null || true
 RUN npm run build --workspace=api
 
