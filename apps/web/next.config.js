@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // output: 'standalone' kaldırıldı - asset 404 sorununa yol açabiliyordu
+  // output: 'standalone' monorepo'da sorun çıkarıyor - next start kullanıyoruz
   async rewrites() {
     return [
       {
